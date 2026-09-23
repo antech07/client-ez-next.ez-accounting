@@ -3,11 +3,11 @@
 import React, { useEffect, useState, useId } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { PRICING_API, PRICINGPOINT_API } from "@/utils/api";
 
 /*  ICONS  */
 const CheckIcon = ({ className }) => {
   const uid = useId();
-  const gradientId = `checkGradient-${uid}`;
 
   return (
     <svg
@@ -34,14 +34,14 @@ const CheckIcon = ({ className }) => {
         height="15.2"
         rx="7.6"
         stroke="#B3B3B3"
-        stroke-width="0.8"
+        strokeWidth="0.8"
       />
       <path
         d="M11.76 5.87988L7.14004 10.4999L5.04004 8.39988"
         stroke="#4D4D4D"
-        stroke-width="1.6"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <defs>
         <linearGradient
@@ -52,9 +52,9 @@ const CheckIcon = ({ className }) => {
           y2="10.3731"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#2758D0" />
-          <stop offset="0.5" stop-color="#193269" />
-          <stop offset="1" stop-color="#0F152C" />
+          <stop stopColor="#2758D0" />
+          <stop offset="0.5" stopColor="#193269" />
+          <stop offset="1" stopColor="#0F152C" />
         </linearGradient>
       </defs>
     </svg>
@@ -79,13 +79,13 @@ const CheckIconSolid = ({ className }) => (
       fill="url(#paint0_linear_1047_7675)"
     />
     <rect x="0.4" y="0.4" width="15.2" height="15.2" rx="7.6" fill="#FEFEFE" />
-    <rect x="0.4" y="0.4" width="15.2" height="15.2" rx="7.6" stroke="#F36C24" stroke-width="0.8" />
+    <rect x="0.4" y="0.4" width="15.2" height="15.2" rx="7.6" stroke="#F36C24" strokeWidth="0.8" />
     <path
       d="M11.76 5.87988L7.14004 10.4999L5.04004 8.39988"
       stroke="#F36C24"
-      stroke-width="1.6"
-      stroke-linecap="round"
-      stroke-linejoin="round"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     />
     <defs>
       <linearGradient
@@ -96,9 +96,9 @@ const CheckIconSolid = ({ className }) => (
         y2="10.3731"
         gradientUnits="userSpaceOnUse"
       >
-        <stop stop-color="#2758D0" />
-        <stop offset="0.5" stop-color="#193269" />
-        <stop offset="1" stop-color="#0F152C" />
+        <stop stopColor="#2758D0" />
+        <stop offset="0.5" stopColor="#193269" />
+        <stop offset="1" stopColor="#0F152C" />
       </linearGradient>
     </defs>
   </svg>
@@ -137,22 +137,21 @@ function SlideFromLeft({ children, delay = 0 }) {
 }
 
 /*  STANDARD CARD  */
-function StandardCard({ onGetPlan }) {
+function StandardCard({ onGetPlan, cardData, points = [] }) {
   return (
     <div className="mx-auto flex h-[950px] w-full flex-col rounded-[24px] border border-[#E6E6E6] bg-[#FEFEFE] px-[20px] py-[28px] lm:h-[890px]">
       <div className="flex flex-col gap-[4px]">
         <h3 className="h-[40px] font-fustat text-[24px] font-[700] leading-[1.4] text-[#121212] lg:text-[32px]">
-          Package for GPs
+          {cardData?.title}
         </h3>
         <p className="font-plusJakarta text-[14px] font-[500] leading-[1.3] text-[#4D4D4D]">
-          Preparation of Annual financial accounts, based on the information being entered and
-          reconciled in an accounting software package.
+          {cardData?.subtitle}
         </p>
       </div>
 
       <div className="mt-[16px] flex h-[52px] items-end gap-[8px] font-fustat lm:mt-[14px]">
         <span className="text-[32px] font-[700] leading-[1.7] text-[#121212] lg:text-[48px]">
-          $300
+          {cardData?.price !== undefined ? `$${cardData.price}` : ""}
         </span>
         <span className="mb-[15px] text-[18px] font-[500] leading-[1.7] text-[#121212]">
           + GST/per month
@@ -179,16 +178,7 @@ function StandardCard({ onGetPlan }) {
       <div className="flex h-[171px] flex-col gap-[12px] pb-[67px]">
         <p className="font-fustat text-[16px] font-[600] text-[#050503]">This Plan Includes:</p>
 
-        {[
-          "Preparation of Income Tax Returns and Tax planning",
-          "Review and analysis of your financial accounts",
-          "Bookkeeping ( Up to 500 transactions in a year, additional charges apply)",
-          "Review and assist in preparation and lodgement of your BAS/GST, PAYGW and PAYGI obligations to the ATO as necessary",
-          "Review and analysis of your financial accounts",
-          "Accounting Software subscription includedt",
-          "Finalizations and compilation of all documents as required for your signature and for lodgement with the Australian Taxation Office where required",
-          "Annual package for GP",
-        ].map((item, i) => (
+        {points.map((item, i) => (
           <div key={i} className="flex items-center gap-[12px]">
             <CheckIcon className="h-4 w-4 flex-shrink-0" />
             <span className="font-plusJakarta text-[14px] font-[500] leading-[1.7] text-[#4D4D4D]">
@@ -202,12 +192,11 @@ function StandardCard({ onGetPlan }) {
 }
 
 /*  BUSINESS CARD  */
-function BusinessCard({ onGetPlan }) {
+function BusinessCard({ onGetPlan, cardData, points = [] }) {
   return (
     <div
       className="relative z-20 mx-auto flex h-[940px] w-full flex-col rounded-[24px] border border-[#E6E6E6] bg-[#FEFEFE] bg-no-repeat px-[20px] py-[28px] text-white lm:h-[860px]"
       style={{
-        // backgroundImage: "url(/assets/home/share/Card.png)",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
@@ -215,7 +204,7 @@ function BusinessCard({ onGetPlan }) {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h3 className="h-[40px] font-fustat text-[20px] font-[700] leading-[1.4] text-[#121212] lg:text-[32px]">
-          Small Businesses
+          {cardData?.title}
         </h3>
 
         <span className="flex h-[26px] w-[90px] items-center justify-center rounded-[6px] bg-cover bg-center bg-no-repeat">
@@ -231,14 +220,13 @@ function BusinessCard({ onGetPlan }) {
 
       {/* Subtitle */}
       <p className="font-plusJakarta text-[14px] font-[500] leading-[1.3] text-[#4D4D4D]">
-        Preparation of Annual financial accounts, based on the information being entered and
-        reconciled in an accounting software package.
+        {cardData?.subtitle}
       </p>
 
       {/* Price */}
       <div className="mt-[16px] flex h-[52px] items-end gap-[8px] font-fustat lm:mt-[14px]">
         <span className="text-[32px] font-[700] leading-[1.7] text-[#121212] lg:text-[48px]">
-          $450
+          {cardData?.price !== undefined ? `$${cardData.price}` : ""}
         </span>
         <span className="mb-[15px] text-[18px] font-[500] leading-[1.7] text-[#121212]">
           + GST /per month
@@ -269,21 +257,13 @@ function BusinessCard({ onGetPlan }) {
         }}
       />
 
-      {/* Includes (spacing like StandardCard) */}
+      {/* Includes */}
       <div className="flex h-[171px] flex-col gap-[12px] pb-[67px]">
         <p className="font-plusJakarta text-[16px] font-[600] text-[#333333]">
           This Plan Includes:
         </p>
 
-        {[
-          "Preparation of Income Tax Returns and Tax planning",
-          "Review and analysis of your financial accounts",
-          "Bookkeeping ( Up to 500 transactions in a year, additional charges apply)",
-          "Review and assist in preparation and lodgement of your BAS/GST, PAYGW and PAYGI obligations to the ATO as necessary",
-          "Review and analysis of your financial accounts",
-          "Accounting Software subscription included",
-          "Finalizations and compilation of all documents as required for your signature and for lodgement with the Australian Taxation Office where required",
-        ].map((item, i) => (
+        {points.map((item, i) => (
           <div key={i} className="flex items-center gap-[12px]">
             <CheckIconSolid className="h-4 w-4 flex-shrink-0" />
             <span className="font-plusJakarta text-[14px] font-[500] leading-[1.7] text-[#4D4D4D]">
@@ -297,22 +277,21 @@ function BusinessCard({ onGetPlan }) {
 }
 
 /*  ENTERPRISE CARD  */
-function EnterpriseCard({ onGetPlan }) {
+function EnterpriseCard({ onGetPlan, cardData, points = [] }) {
   return (
     <div className="mx-auto flex h-[940px] w-full flex-col rounded-[24px] border border-[#E6E6E6] bg-[#FEFEFE] px-[20px] py-[28px] lm:h-[860px]">
       <div className="flex flex-col gap-[4px]">
         <h3 className="h-[45px] font-fustat text-[24px] font-[700] leading-[1.4] text-[#121212] lg:text-[32px]">
-          Businesses with Payroll
+          {cardData?.title}
         </h3>
         <p className="font-plusJakarta text-[14px] font-[500] leading-[1.3] text-[#4D4D4D]">
-          Preparation of Annual financial accounts, based on the information being entered and
-          reconciled in an accounting software package.
+          {cardData?.subtitle}
         </p>
       </div>
 
       <div className="mt-[16px] flex items-end gap-[8px] font-fustat lm:mt-[14px]">
         <span className="text-[32px] font-[700] leading-[1.7] text-[#121212] lg:text-[48px]">
-          $600
+          {cardData?.price !== undefined ? `$${cardData.price}` : ""}
         </span>
         <span className="mb-[15px] text-[18px] font-[500] leading-[1.7] text-[#121212]">
           + GST /per month
@@ -339,15 +318,7 @@ function EnterpriseCard({ onGetPlan }) {
       <div className="flex h-[171px] flex-col gap-[12px] pb-[67px]">
         <p className="font-fustat text-[16px] font-[600] text-[#050503]">This Plan Includes:</p>
 
-        {[
-          "Preparation of Income Tax Returns and Tax planning",
-          "Review and analysis of your financial accounts",
-          "Bookkeeping (Up to 500 transactions in a year, additional charges apply)",
-          "Review and assist in preparation and lodgement of your BAS/GST, PAYGW and PAYGI obligations to the ATO as necessary",
-          "Review and analysis of your financial accounts",
-          "Accounting Software subscription included",
-          "Finalizations and compilation of all documents as required for your signature and for lodgement with the Australian Taxation Office where required",
-        ].map((item, i) => (
+        {points.map((item, i) => (
           <div key={i} className="flex items-center gap-[12px]">
             <CheckIcon className="h-4 w-4 flex-shrink-0" />
             <span className="font-plusJakarta text-[14px] font-[500] leading-[1.7] text-[#4D4D4D]">
@@ -363,21 +334,92 @@ function EnterpriseCard({ onGetPlan }) {
 /*  MAIN (MOBILE ONLY)  */
 export default function StandardBusinessCardMobile({ onGetPlan }) {
   const isMobile = useMediaQuery("(max-width: 1023px)");
+  const [pricingList, setPricingList] = useState([]);
+  const [pricingPoints, setPricingPoints] = useState([]);
+
+  useEffect(() => {
+    if (!isMobile) return;
+
+    const normalizeArray = (result) => {
+      if (Array.isArray(result)) return result;
+      if (Array.isArray(result?.data)) return result.data;
+      if (Array.isArray(result?.result)) return result.result;
+      if (Array.isArray(result?.data?.data)) return result.data.data;
+      if (Array.isArray(result?.data?.result)) return result.data.result;
+      return [];
+    };
+
+    const fetchData = async () => {
+      try {
+        const [resPricing, resPoints] = await Promise.all([
+          fetch(PRICING_API, { cache: "no-store" }),
+          fetch(PRICINGPOINT_API, { cache: "no-store" }),
+        ]);
+
+        const jsonPricing = await resPricing.json();
+        const jsonPoints = await resPoints.json();
+
+        setPricingList(normalizeArray(jsonPricing));
+        setPricingPoints(normalizeArray(jsonPoints));
+      } catch (error) {
+        console.error("Error fetching pricing data:", error);
+      }
+    };
+
+    fetchData();
+  }, [isMobile]);
+
   if (!isMobile) return null;
+
+  const activePricings = pricingList.filter((p) => p.isActive !== false);
+
+  const sortedPricing = [...activePricings].sort(
+    (a, b) => (Number(a.price) || 0) - (Number(b.price) || 0),
+  );
+
+  const card1Data =
+    activePricings.find(
+      (p) => p.slug === "package-for-gps" || p.title?.toLowerCase().includes("gp"),
+    ) || sortedPricing[0];
+
+  const card2Data =
+    activePricings.find(
+      (p) => p.slug === "small-businesses" || p.title?.toLowerCase().includes("small"),
+    ) || sortedPricing[1];
+
+  const card3Data =
+    activePricings.find(
+      (p) => p.slug === "businesses-with-payroll" || p.title?.toLowerCase().includes("payroll"),
+    ) || sortedPricing[2];
+
+  const getPointsForPricing = (pricingId) => {
+    if (!pricingId) return [];
+    return pricingPoints
+      .filter((pt) => {
+        if (pt.isActive === false) return false;
+        const ptPricingId = typeof pt.pricing === "object" ? pt.pricing?._id : pt.pricing;
+        return String(ptPricingId) === String(pricingId);
+      })
+      .map((pt) => pt.planPoint);
+  };
+
+  const card1Points = card1Data ? getPointsForPricing(card1Data._id) : [];
+  const card2Points = card2Data ? getPointsForPricing(card2Data._id) : [];
+  const card3Points = card3Data ? getPointsForPricing(card3Data._id) : [];
 
   return (
     <div className="mx-auto w-full px-[16px]">
       <div className="flex flex-col gap-[24px]">
         <SlideFromLeft delay={0}>
-          <StandardCard onGetPlan={onGetPlan} />
+          <StandardCard onGetPlan={onGetPlan} cardData={card1Data} points={card1Points} />
         </SlideFromLeft>
 
         <SlideFromLeft delay={0.1}>
-          <BusinessCard onGetPlan={onGetPlan} />
+          <BusinessCard onGetPlan={onGetPlan} cardData={card2Data} points={card2Points} />
         </SlideFromLeft>
 
         <SlideFromLeft delay={0.2}>
-          <EnterpriseCard onGetPlan={onGetPlan} />
+          <EnterpriseCard onGetPlan={onGetPlan} cardData={card3Data} points={card3Points} />
         </SlideFromLeft>
       </div>
     </div>

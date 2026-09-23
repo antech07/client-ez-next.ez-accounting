@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { PRICING_API, PRICINGPOINT_API } from "@/utils/api";
 
 const CheckIcon = ({ className }) => (
   <svg
@@ -90,6 +91,75 @@ const CheckIconSolid = ({ className }) => (
 );
 
 function StandardBusinessCard({ onGetPlan }) {
+  const [pricingList, setPricingList] = useState([]);
+  const [pricingPoints, setPricingPoints] = useState([]);
+
+  useEffect(() => {
+    const normalizeArray = (result) => {
+      if (Array.isArray(result)) return result;
+      if (Array.isArray(result?.data)) return result.data;
+      if (Array.isArray(result?.result)) return result.result;
+      if (Array.isArray(result?.data?.data)) return result.data.data;
+      if (Array.isArray(result?.data?.result)) return result.data.result;
+      return [];
+    };
+
+    const fetchData = async () => {
+      try {
+        const [resPricing, resPoints] = await Promise.all([
+          fetch(PRICING_API, { cache: "no-store" }),
+          fetch(PRICINGPOINT_API, { cache: "no-store" }),
+        ]);
+
+        const jsonPricing = await resPricing.json();
+        const jsonPoints = await resPoints.json();
+
+        setPricingList(normalizeArray(jsonPricing));
+        setPricingPoints(normalizeArray(jsonPoints));
+      } catch (error) {
+        console.error("Error fetching pricing data:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const activePricings = pricingList.filter((p) => p.isActive !== false);
+
+  const sortedPricing = [...activePricings].sort(
+    (a, b) => (Number(a.price) || 0) - (Number(b.price) || 0),
+  );
+
+  const card1Data =
+    activePricings.find(
+      (p) => p.slug === "package-for-gps" || p.title?.toLowerCase().includes("gp"),
+    ) || sortedPricing[0];
+
+  const card2Data =
+    activePricings.find(
+      (p) => p.slug === "small-businesses" || p.title?.toLowerCase().includes("small"),
+    ) || sortedPricing[1];
+
+  const card3Data =
+    activePricings.find(
+      (p) => p.slug === "businesses-with-payroll" || p.title?.toLowerCase().includes("payroll"),
+    ) || sortedPricing[2];
+
+  const getPointsForPricing = (pricingId) => {
+    if (!pricingId) return [];
+    return pricingPoints
+      .filter((pt) => {
+        if (pt.isActive === false) return false;
+        const ptPricingId = typeof pt.pricing === "object" ? pt.pricing?._id : pt.pricing;
+        return String(ptPricingId) === String(pricingId);
+      })
+      .map((pt) => pt.planPoint);
+  };
+
+  const card1Points = card1Data ? getPointsForPricing(card1Data._id) : [];
+  const card2Points = card2Data ? getPointsForPricing(card2Data._id) : [];
+  const card3Points = card3Data ? getPointsForPricing(card3Data._id) : [];
+
   return (
     <div className="mx-auto flex w-full lg:max-w-[1000px] lg:gap-[20px] xl:max-w-[1100px] xl:gap-[20px] 2xl:max-w-[1280px] 2xl:gap-[30px]">
       {/* STANDARD */}
@@ -103,18 +173,17 @@ function StandardBusinessCard({ onGetPlan }) {
         {/* Title */}
         <div className="flex flex-col gap-[4px]">
           <h3 className="font-fustat text-[24px] font-[700] leading-[1.4] text-[#121212] lg:text-[14px] xl:text-[17px] 2xl:text-[19px] 3xl:text-[24px]">
-            Package for GPs
+            {card1Data?.title}
           </h3>
           <p className="font-plusJakarta font-[500] leading-[1.4] text-[#4D4D4D] lg:text-[12px] 2xl:text-[14px]">
-            Preparation of Annual financial accounts, based on the information being entered and
-            reconciled in an accounting software package.
+            {card1Data?.subtitle}
           </p>
         </div>
 
         {/* Price */}
         <div className="mt-[8px] flex items-end gap-[8px] font-fustat">
           <span className="text-[48px] font-[700] leading-[1.7] text-[#121212] lg:text-[25px] xl:text-[34px] 2xl:text-[38px] 3xl:text-[48px]">
-            $350
+            {card1Data?.price !== undefined ? `$${card1Data.price}` : ""}
           </span>
           <span className="mb-[15px] text-[18px] font-[500] leading-[1.7] text-[#121212]">
             + GST /per month
@@ -145,16 +214,7 @@ function StandardBusinessCard({ onGetPlan }) {
           <p className="font-fustat text-[16px] font-[600] text-[#050503]">This Plan Includes:</p>
 
           <div className="flex flex-col gap-[10px]">
-            {[
-              "Preparation of Income Tax Returns and Tax planning",
-              "Review and analysis of your financial accounts",
-              "Bookkeeping ( Up to 500 transactions in a year, additional charges apply)",
-              "Review and assist in preparation and lodgement of your BAS/GST, PAYGW and PAYGI obligations to the ATO as necessary",
-              "Review and analysis of your financial accounts",
-              "Accounting Software subscription includedt",
-              "Finalizations and compilation of all documents as required for your signature and for lodgement with the Australian Taxation Office where required",
-              "Annual package for GP",
-            ].map((item, i) => (
+            {card1Points.map((item, i) => (
               <div key={i} className="flex items-start gap-[12px]">
                 <CheckIcon className="h-4 w-4 flex-shrink-0" />
                 <span className="font-plusJakarta text-[14px] text-[#4D4D4D]">{item}</span>
@@ -175,7 +235,7 @@ function StandardBusinessCard({ onGetPlan }) {
         {/* Header */}
         <div className="flex items-center justify-between">
           <h3 className="font-fustat text-[24px] font-[700] leading-[1.4] text-[#121212] lg:text-[14px] xl:text-[17px] 2xl:text-[19px] 3xl:text-[24px]">
-            Small Businesses
+            {card2Data?.title}
           </h3>
 
           <span className="flex h-[26px] w-[104px] items-center justify-center rounded-[6px]">
@@ -191,14 +251,13 @@ function StandardBusinessCard({ onGetPlan }) {
 
         {/* Subtitle */}
         <p className="mt-[4px] leading-[1.4] text-[#4D4D4D] lg:text-[12px] 2xl:text-[14px]">
-          Preparation of Annual financial accounts, based on the information being entered and
-          reconciled in an accounting software package.
+          {card2Data?.subtitle}
         </p>
 
         {/* Price */}
         <div className="mt-[8px] flex items-end gap-[8px] font-fustat">
           <span className="text-[48px] font-[700] leading-[1.7] text-[#121212] lg:text-[25px] xl:text-[34px] 2xl:text-[38px] 3xl:text-[48px]">
-            $450
+            {card2Data?.price !== undefined ? `$${card2Data.price}` : ""}
           </span>
           <span className="mb-[15px] text-[18px] font-[500] leading-[1.7] text-[#121212]">
             + GST /per month
@@ -229,20 +288,12 @@ function StandardBusinessCard({ onGetPlan }) {
           }}
         />
 
-        {/* Includes (FIXED HERE) */}
+        {/* Includes */}
         <div className="flex flex-1 flex-col gap-[12px]">
           <p className="font-[600] text-[#333333]">This Plan Includes:</p>
 
           <div className="flex flex-col gap-[10px]">
-            {[
-              "Preparation of Income Tax Returns and Tax planning",
-              "Review and analysis of your financial accounts",
-              "Bookkeeping ( Up to 500 transactions in a year, additional charges apply)",
-              "Review and assist in preparation and lodgement of your BAS/GST, PAYGW and PAYGI obligations to the ATO as necessary",
-              "Review and analysis of your financial accounts",
-              "Accounting Software subscription included",
-              "Finalizations and compilation of all documents as required for your signature and for lodgement with the Australian Taxation Office where required",
-            ].map((item, i) => (
+            {card2Points.map((item, i) => (
               <div key={i} className="flex items-start gap-[12px]">
                 <CheckIconSolid className="h-4 w-4 flex-shrink-0" />
                 <span className="font-plusJakarta text-[14px] text-[#4D4D4D]">{item}</span>
@@ -263,18 +314,17 @@ function StandardBusinessCard({ onGetPlan }) {
         {/* Title */}
         <div className="flex flex-col gap-[4px]">
           <h3 className="font-fustat text-[24px] font-[700] text-[#121212] lg:text-[14px] xl:text-[17px] 2xl:text-[19px] 3xl:text-[24px]">
-            Businesses with Payroll
+            {card3Data?.title}
           </h3>
           <p className="font-plusJakarta font-[500] leading-[1.4] text-[#4D4D4D] lg:text-[12px] 2xl:text-[14px]">
-            Preparation of Annual financial accounts, based on the information being entered and
-            reconciled in an accounting software package.
+            {card3Data?.subtitle}
           </p>
         </div>
 
         {/* Price */}
         <div className="mt-[8px] flex items-end gap-[8px] font-fustat">
           <span className="text-[48px] font-[700] leading-[1.7] text-[#121212] lg:text-[25px] xl:text-[34px] 2xl:text-[38px] 3xl:text-[48px]">
-            $600
+            {card3Data?.price !== undefined ? `$${card3Data.price}` : ""}
           </span>
           <span className="mb-[15px] text-[18px] font-[500] leading-[1.7] text-[#121212]">
             + GST /per month
@@ -300,20 +350,12 @@ function StandardBusinessCard({ onGetPlan }) {
           }}
         />
 
-        {/* Includes (FIXED) */}
+        {/* Includes */}
         <div className="flex flex-1 flex-col gap-[12px]">
           <p className="font-fustat text-[16px] font-[600] text-[#050503]">This Plan Includes:</p>
 
           <div className="flex flex-col gap-[10px]">
-            {[
-              "Preparation of Income Tax Returns and Tax planning",
-              "Review and analysis of your financial accounts",
-              "Bookkeeping (Up to 500 transactions in a year, additional charges apply)",
-              "Review and assist in preparation and lodgement of your BAS/GST, PAYGW and PAYGI obligations to the ATO as necessary",
-              "Review and analysis of your financial accounts",
-              "Accounting Software subscription included",
-              "Finalizations and compilation of all documents as required for your signature and for lodgement with the Australian Taxation Office where required",
-            ].map((item, i) => (
+            {card3Points.map((item, i) => (
               <div key={i} className="flex items-start gap-[12px]">
                 <CheckIcon className="h-4 w-4 flex-shrink-0" />
                 <span className="font-plusJakarta text-[14px] text-[#4D4D4D]">{item}</span>

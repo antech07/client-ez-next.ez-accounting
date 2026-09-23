@@ -67,6 +67,7 @@ export default async function Page() {
           <EasytoGetStarted
             professionalCredentials={professionalCredentials.data}
             partners={partners.data}
+            services={servicesData?.data || servicesData}
           />
         </div>
         <div className="relative z-20 lg:bottom-[-35px] xl:bottom-[-50px] 2xl:bottom-[-68px]">

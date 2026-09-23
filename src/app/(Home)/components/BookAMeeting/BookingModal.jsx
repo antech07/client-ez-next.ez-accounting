@@ -4,9 +4,11 @@ import { createPortal } from "react-dom";
 import { submitContactRequest } from "@/utils/contact";
 import { toast } from "react-hot-toast";
 import CustomSelect from "@/app/contact/GetInTouch/CustomSelect";
+import { SERVICES_API } from "@/utils/api";
 
-export default function BookingModal({ isOpen, onClose, services = [] }) {
+export default function BookingModal({ isOpen, onClose, services: initialServices = [] }) {
   const [isMounted, setIsMounted] = useState(false);
+  const [services, setServices] = useState(initialServices);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -18,9 +20,33 @@ export default function BookingModal({ isOpen, onClose, services = [] }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
+    if (initialServices && initialServices.length > 0) {
+      setServices(initialServices);
+    }
+  }, [initialServices]);
+
+  useEffect(() => {
     setIsMounted(true);
     if (isOpen) {
       document.body.style.overflow = "hidden";
+
+      if (!services || services.length === 0) {
+        const normalizeArray = (result) => {
+          if (Array.isArray(result)) return result;
+          if (Array.isArray(result?.data)) return result.data;
+          if (Array.isArray(result?.result)) return result.result;
+          if (Array.isArray(result?.data?.data)) return result.data.data;
+          if (Array.isArray(result?.data?.result)) return result.data.result;
+          return [];
+        };
+
+        fetch(SERVICES_API, { cache: "no-store" })
+          .then((res) => res.json())
+          .then((result) => {
+            setServices(normalizeArray(result));
+          })
+          .catch((err) => console.error("Services fetch error in BookingModal:", err));
+      }
     } else {
       document.body.style.overflow = "auto";
     }

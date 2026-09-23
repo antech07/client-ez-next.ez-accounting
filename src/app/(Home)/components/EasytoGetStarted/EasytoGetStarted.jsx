@@ -1,13 +1,43 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import OurStandards from "./OurStandards";
 import StandardBusinessCard from "./StandardBusinessCard";
 import StandardBusinessCardMobile from "./StandardBusinessCardMobile";
 import Credential from "./Credential";
 import BookingModal from "../BookAMeeting/BookingModal";
+import { SERVICES_API } from "@/utils/api";
 
-function EasytoGetStarted({ professionalCredentials, partners }) {
+function EasytoGetStarted({ professionalCredentials, partners, services: initialServices }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [services, setServices] = useState(initialServices || []);
+
+  useEffect(() => {
+    if (initialServices && initialServices.length > 0) {
+      setServices(initialServices);
+      return;
+    }
+
+    const normalizeArray = (result) => {
+      if (Array.isArray(result)) return result;
+      if (Array.isArray(result?.data)) return result.data;
+      if (Array.isArray(result?.result)) return result.result;
+      if (Array.isArray(result?.data?.data)) return result.data.data;
+      if (Array.isArray(result?.data?.result)) return result.data.result;
+      return [];
+    };
+
+    const fetchServices = async () => {
+      try {
+        const res = await fetch(SERVICES_API, { cache: "no-store" });
+        const result = await res.json();
+        setServices(normalizeArray(result));
+      } catch (error) {
+        console.error("Services fetch error:", error);
+      }
+    };
+
+    fetchServices();
+  }, [initialServices]);
 
   const openBookingModal = () => setIsModalOpen(true);
 
@@ -22,23 +52,6 @@ function EasytoGetStarted({ professionalCredentials, partners }) {
           Easily track and manage your sales pipeline with real-time updates, visual deal stages to
           keep your sales flow seamless.
         </p>
-
-        {/* <div className="mt-[24px] flex items-center justify-center gap-[16px] lg:mt-[60px]">
-          <span className="font-plusJakarta text-[16px] font-[400] leading-[1.7] text-[#121212]">
-            Billed monthly
-          </span>
-
-          <button
-            type="button"
-            className="relative h-[24px] w-[40px] cursor-pointer rounded-full border-none bg-[#2F5BEA] lg:h-[30px] lg:w-[52px]"
-          >
-            <span className="absolute left-[-2px] top-[2px] h-[20px] w-[20px] translate-x-[20px] rounded-full bg-[#FBF9F5] lg:left-[4px] lg:h-[25px] lg:w-[25px]" />
-          </button>
-
-          <span className="font-plusJakarta text-[16px] font-[400] leading-[1.7] text-[#121212]">
-            Billed Yearly
-          </span>
-        </div> */}
       </div>
       <div className="mt-[40px] hidden lg:block">
         <StandardBusinessCard onGetPlan={openBookingModal} />
@@ -55,7 +68,11 @@ function EasytoGetStarted({ professionalCredentials, partners }) {
         <OurStandards partners={partners} />
       </div>
 
-      <BookingModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <BookingModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        services={services}
+      />
     </div>
   );
 }

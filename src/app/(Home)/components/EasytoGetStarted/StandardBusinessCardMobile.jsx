@@ -104,6 +104,41 @@ const CheckIconSolid = ({ className }) => (
   </svg>
 );
 
+const MobileCardSkeleton = ({ initial }) => (
+  <motion.div
+    initial={initial}
+    animate={initial}
+    className="mx-auto flex h-[950px] w-full animate-pulse flex-col rounded-[24px] border border-[#E6E6E6] bg-[#FEFEFE] px-[20px] py-[28px] lm:h-[890px]"
+  >
+    <div className="flex flex-col gap-[8px]">
+      <div className="h-[28px] w-3/4 rounded-md bg-gray-200" />
+      <div className="mt-2 h-[14px] w-full rounded bg-gray-200" />
+      <div className="h-[14px] w-5/6 rounded bg-gray-200" />
+    </div>
+
+    <div className="mt-[20px] flex items-end gap-[8px]">
+      <div className="h-[40px] w-[100px] rounded-md bg-gray-200" />
+      <div className="mb-[6px] h-[18px] w-[100px] rounded bg-gray-200" />
+    </div>
+
+    <div className="mx-auto mt-[20px] h-[52px] w-[303px] rounded-[12px] bg-gray-200" />
+
+    <div className="my-[20px] h-px w-full bg-gray-200" />
+
+    <div className="flex flex-col gap-[16px]">
+      <div className="h-[18px] w-2/5 rounded bg-gray-200" />
+      <div className="flex flex-col gap-[12px]">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="flex items-center gap-[12px]">
+            <div className="h-4 w-4 flex-shrink-0 rounded-full bg-gray-200" />
+            <div className="h-[14px] w-full rounded bg-gray-200" />
+          </div>
+        ))}
+      </div>
+    </div>
+  </motion.div>
+);
+
 /* ---------------- MEDIA QUERY ---------------- */
 function useMediaQuery(query) {
   const [matches, setMatches] = useState(false);
@@ -336,6 +371,7 @@ export default function StandardBusinessCardMobile({ onGetPlan }) {
   const isMobile = useMediaQuery("(max-width: 1023px)");
   const [pricingList, setPricingList] = useState([]);
   const [pricingPoints, setPricingPoints] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!isMobile) return;
@@ -363,6 +399,8 @@ export default function StandardBusinessCardMobile({ onGetPlan }) {
         setPricingPoints(normalizeArray(jsonPoints));
       } catch (error) {
         console.error("Error fetching pricing data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -370,6 +408,18 @@ export default function StandardBusinessCardMobile({ onGetPlan }) {
   }, [isMobile]);
 
   if (!isMobile) return null;
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto w-full overflow-hidden px-[16px]">
+        <div className="flex flex-col gap-[24px]">
+          <MobileCardSkeleton initial={{ opacity: 0, x: -140 }} />
+          <MobileCardSkeleton initial={{ opacity: 0, x: -140 }} />
+          <MobileCardSkeleton initial={{ opacity: 0, x: -140 }} />
+        </div>
+      </div>
+    );
+  }
 
   const activePricings = pricingList.filter((p) => p.isActive !== false);
 

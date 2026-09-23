@@ -90,9 +90,51 @@ const CheckIconSolid = ({ className }) => (
   </svg>
 );
 
+const CardSkeleton = ({ initial }) => (
+  <motion.div
+    initial={initial}
+    animate={initial}
+    className="mx-auto flex h-full animate-pulse flex-col rounded-[24px] border border-[#E6E6E6] bg-[#FEFEFE] px-[24px] py-[32px] lg:h-[910px] lg:w-[300px] xl:h-[860px] xl:w-[366px] 2xl:h-[800px] 2xl:w-[406.67px]"
+  >
+    {/* Title & Subtitle Skeleton */}
+    <div className="flex flex-col gap-[8px]">
+      <div className="h-[28px] w-3/4 rounded-md bg-gray-200" />
+      <div className="mt-2 h-[14px] w-full rounded bg-gray-200" />
+      <div className="h-[14px] w-5/6 rounded bg-gray-200" />
+    </div>
+
+    {/* Price Skeleton */}
+    <div className="mt-[20px] flex items-end gap-[8px]">
+      <div className="h-[48px] w-[120px] rounded-md bg-gray-200" />
+      <div className="mb-[6px] h-[18px] w-[100px] rounded bg-gray-200" />
+    </div>
+
+    {/* Button Skeleton */}
+    <div className="mt-[20px] h-[52px] w-full rounded-[12px] bg-gray-200" />
+
+    {/* Divider */}
+    <div className="my-[24px] h-px w-full bg-gray-200" />
+
+    {/* Includes Skeleton */}
+    <div className="flex flex-1 flex-col gap-[16px]">
+      <div className="h-[18px] w-2/5 rounded bg-gray-200" />
+
+      <div className="flex flex-col gap-[12px]">
+        {[...Array(6)].map((_, i) => (
+          <div key={i} className="flex items-center gap-[12px]">
+            <div className="h-4 w-4 flex-shrink-0 rounded-full bg-gray-200" />
+            <div className="h-[14px] w-full rounded bg-gray-200" />
+          </div>
+        ))}
+      </div>
+    </div>
+  </motion.div>
+);
+
 function StandardBusinessCard({ onGetPlan }) {
   const [pricingList, setPricingList] = useState([]);
   const [pricingPoints, setPricingPoints] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const normalizeArray = (result) => {
@@ -118,11 +160,23 @@ function StandardBusinessCard({ onGetPlan }) {
         setPricingPoints(normalizeArray(jsonPoints));
       } catch (error) {
         console.error("Error fetching pricing data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="mx-auto flex w-full overflow-hidden lg:max-w-[1000px] lg:gap-[20px] xl:max-w-[1100px] xl:gap-[20px] 2xl:max-w-[1280px] 2xl:gap-[30px]">
+        <CardSkeleton initial={{ opacity: 0, x: 440 }} />
+        <CardSkeleton initial={{ opacity: 0 }} />
+        <CardSkeleton initial={{ opacity: 0, x: -440 }} />
+      </div>
+    );
+  }
 
   const activePricings = pricingList.filter((p) => p.isActive !== false);
 

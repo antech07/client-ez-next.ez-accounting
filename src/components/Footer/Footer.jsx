@@ -1,9 +1,89 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { footerLogo, faceBook, email, phone, linkeDin, loveIcon, footerMobileLogo } from "./icons";
+import { SOCIAL_LINKS_API } from "@/utils/api";
+
+const SOCIAL_CONFIG = [
+  { key: "facebook", icon: faceBook, alt: "Facebook" },
+  { key: "email", icon: email, alt: "Email" },
+  { key: "phone", icon: phone, alt: "Phone" },
+  { key: "linkedin", icon: linkeDin, alt: "LinkedIn" },
+];
 
 export default function Footer() {
+  const [socialLinks, setSocialLinks] = useState([]);
+
+  useEffect(() => {
+    const fetchSocialLinks = async () => {
+      try {
+        const res = await fetch(SOCIAL_LINKS_API, { cache: "no-store" });
+        const result = await res.json();
+        const data = Array.isArray(result)
+          ? result
+          : Array.isArray(result?.data)
+            ? result.data
+            : Array.isArray(result?.result)
+              ? result.result
+              : [];
+        setSocialLinks(data.filter((item) => item.isActive !== false));
+      } catch (error) {
+        console.error("Error fetching social links:", error);
+      }
+    };
+
+    fetchSocialLinks();
+  }, []);
+
+  const getSocialLink = (key) => {
+    const item = socialLinks.find(
+      (s) =>
+        s.slug?.toLowerCase() === key ||
+        s.title?.toLowerCase() === key ||
+        s.title?.toLowerCase().includes(key),
+    );
+    if (item && item.link) {
+      return item.link;
+    }
+    if (key === "facebook") {
+      return "https://www.facebook.com/people/EZ-Accounting-Business-Solutions/100069277013130/";
+    }
+    return "#";
+  };
+
+  const renderSocialIcon = (item, i) => {
+    const href = getSocialLink(item.key);
+    const isLinkActive = href && href !== "#";
+
+    const content = (
+      <div className="rounded p-[4px] transition-all duration-300 hover:ring-[4px] hover:ring-[#FEFEFE]/15">
+        <Image
+          className="h-[24px] w-[24px]"
+          src={item.icon}
+          alt={item.alt}
+          width={40}
+          height={40}
+        />
+      </div>
+    );
+
+    if (isLinkActive) {
+      return (
+        <Link key={i} href={href} target="_blank" rel="noopener noreferrer">
+          {content}
+        </Link>
+      );
+    }
+
+    return (
+      <Link key={i} href="#">
+        {content}
+      </Link>
+    );
+  };
+
   return (
     <footer className="h-[909px] w-full overflow-hidden bg-[url('/assets/footer/footerBgMobile.png')] bg-cover bg-center bg-no-repeat lg:h-[480px] lg:bg-[url('/assets/footer/footerBg.png')] lg:px-4 xl:h-[530px] 2xl:h-[584px] 2xl:px-0">
       {/* CONTENT WRAPPER */}
@@ -28,36 +108,9 @@ export default function Footer() {
               </p>
             </div>
 
-            {/* SOCIAL ICONS (UNCHANGED) */}
+            {/* SOCIAL ICONS */}
             <div className="mt-[14px] hidden gap-[24px] lg:flex xl:mt-[18px]">
-              {[faceBook, email, phone, linkeDin].map((icon, i) => {
-                const isFacebook = i === 0;
-
-                const content = (
-                  <div className="rounded p-[4px] transition-all duration-300 hover:ring-[4px] hover:ring-[#FEFEFE]/15">
-                    <Image
-                      className="h-[24px] w-[24px]"
-                      src={icon}
-                      alt="social"
-                      width={40}
-                      height={40}
-                    />
-                  </div>
-                );
-
-                return isFacebook ? (
-                  <Link
-                    key={i}
-                    href="https://www.facebook.com/people/EZ-Accounting-Business-Solutions/100069277013130/"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {content}
-                  </Link>
-                ) : (
-                  <div key={i}>{content}</div>
-                );
-              })}
+              {SOCIAL_CONFIG.map((item, i) => renderSocialIcon(item, i))}
             </div>
           </div>
 
@@ -142,16 +195,9 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* SOCIAL ICONS (UNCHANGED) */}
+        {/* SOCIAL ICONS */}
         <div className="mt-[14px] flex w-full justify-center gap-[24px] lg:hidden xl:mt-[18px]">
-          {[faceBook, email, phone, linkeDin].map((icon, i) => (
-            <div
-              key={i}
-              className="rounded p-[4px] transition-all duration-300 hover:ring-[4px] hover:ring-[#FEFEFE]/15"
-            >
-              <Image className="h-[24px] w-[24px]" src={icon} alt="social" width={40} height={40} />
-            </div>
-          ))}
+          {SOCIAL_CONFIG.map((item, i) => renderSocialIcon(item, i))}
         </div>
 
         {/* DIVIDER */}

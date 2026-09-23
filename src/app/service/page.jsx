@@ -27,7 +27,7 @@ async function page() {
     addons.data,
   );
 
-  console.log(services, "service");
+  // console.log(services, "service");
 
   return (
     <div>

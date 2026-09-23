@@ -8,7 +8,7 @@ import ServiceDetailsDrawer from "../ServiceDetailsDrawer/ServiceDetailsDrawer";
 import ServiceDetailsDrawerMobile from "../ServiceDetailsDrawer/ServiceDetailsDrawerMobile";
 
 export default function ServicesGrid({ services = [] }) {
-  console.log(services);
+  // console.log(services);
 
   const [activeService, setActiveService] = useState(null);
   const [isDesktop, setIsDesktop] = useState(false);

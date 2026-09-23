@@ -22,7 +22,7 @@ export default function ServiceDetailsDrawer({ service, onClose }) {
 
   if (typeof window === "undefined") return null;
 
-  console.log(service.pricing.row);
+  // console.log(service.pricing.row);
 
   return createPortal(
     <motion.div

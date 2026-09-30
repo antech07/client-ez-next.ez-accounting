@@ -13,6 +13,7 @@ export const INDIVIDUALTAXRETURN_API = PROJECT_API + "individualTaxReturn?all=tr
 export const COMMONADDONS_API = PROJECT_API + "commonAddOns?all=true";
 export const TAXFILLING_REQUEST_API =
   Env.backend_url + "insertFormData/ez-accounting/taxfillingrequest";
+export const DOCUMENT_UPLOAD_API = Env.backend_url + "insertFormData/ez-accounting/document";
 
 export const PRICING_API = PROJECT_API + "pricing?all=true";
 export const PRICINGPOINT_API = PROJECT_API + "pricingpoint?all=true";

@@ -71,6 +71,8 @@ export default function TaxReturnForm() {
     sharesCryptoIncome: "",
     rentalPropertyStatus: "",
     otherPropertiesDescription: "",
+    documentFile: null,
+    document: "",
   });
 
   const scrollToTop = () => {
@@ -154,6 +156,8 @@ export default function TaxReturnForm() {
             sharesCryptoIncome: "",
             rentalPropertyStatus: "",
             otherPropertiesDescription: "",
+            documentFile: null,
+            document: "",
           });
           setCurrentStep(1);
         }

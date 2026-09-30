@@ -106,15 +106,34 @@ export const submitTaxFillingRequest = async (formData) => {
 
     description: formData.otherPropertiesDescription,
 
-    document: "doc",
+    document: formData.document || formData.documentFile?.name || "doc",
     recipients: Env.recipients,
   };
 
   try {
+    let body;
+    let headers = {};
+
+    if (formData.documentFile) {
+      const data = new FormData();
+      data.append("file", formData.documentFile);
+      data.append("document", formData.documentFile);
+
+      Object.keys(payload).forEach((key) => {
+        if (payload[key] !== undefined && payload[key] !== null) {
+          data.append(key, payload[key]);
+        }
+      });
+      body = data;
+    } else {
+      headers["Content-Type"] = "application/json";
+      body = JSON.stringify(payload);
+    }
+
     const res = await fetch(TAXFILLING_REQUEST_API, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      headers,
+      body,
     });
 
     const text = await res.text();

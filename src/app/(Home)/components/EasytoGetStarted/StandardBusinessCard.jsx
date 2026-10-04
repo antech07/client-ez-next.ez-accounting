@@ -181,23 +181,12 @@ function StandardBusinessCard({ onGetPlan }) {
   const activePricings = pricingList.filter((p) => p.isActive !== false);
 
   const sortedPricing = [...activePricings].sort(
-    (a, b) => (Number(a.price) || 0) - (Number(b.price) || 0),
+    (a, b) => (Number(a.precedence) || 0) - (Number(b.precedence) || 0),
   );
 
-  const card1Data =
-    activePricings.find(
-      (p) => p.slug === "package-for-gps" || p.title?.toLowerCase().includes("gp"),
-    ) || sortedPricing[0];
-
-  const card2Data =
-    activePricings.find(
-      (p) => p.slug === "small-businesses" || p.title?.toLowerCase().includes("small"),
-    ) || sortedPricing[1];
-
-  const card3Data =
-    activePricings.find(
-      (p) => p.slug === "businesses-with-payroll" || p.title?.toLowerCase().includes("payroll"),
-    ) || sortedPricing[2];
+  const card1Data = sortedPricing[0];
+  const card2Data = sortedPricing[1];
+  const card3Data = sortedPricing[2];
 
   const getPointsForPricing = (pricingId) => {
     if (!pricingId) return [];
@@ -207,6 +196,7 @@ function StandardBusinessCard({ onGetPlan }) {
         const ptPricingId = typeof pt.pricing === "object" ? pt.pricing?._id : pt.pricing;
         return String(ptPricingId) === String(pricingId);
       })
+      .sort((a, b) => (Number(a.precedence) || 0) - (Number(b.precedence) || 0))
       .map((pt) => pt.planPoint);
   };
 

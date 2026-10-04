@@ -1,21 +1,15 @@
 import { CONTACT_REQUEST_API, TAXFILLING_REQUEST_API } from "./api";
-import { Env } from "./env";
 
 /**
  * Submit a contact request to the backend
  * @param {Object} payload - Contact form data
  */
 export const submitContactRequest = async (payload) => {
-  const body = {
-    ...payload,
-    recipients: Env.recipients,
-  };
-
   try {
     const res = await fetch(CONTACT_REQUEST_API, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify(payload),
     });
 
     const text = await res.text();
@@ -113,7 +107,6 @@ export const submitTaxFillingRequest = async (formData) => {
     description: formData.otherPropertiesDescription,
 
     document: formData.document || formData.documentFile?.name || "doc",
-    recipients: Env.recipients,
   };
 
   try {

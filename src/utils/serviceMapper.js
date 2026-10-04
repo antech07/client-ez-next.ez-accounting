@@ -8,6 +8,9 @@ const belongsToService = (item, serviceId) => {
   });
 };
 
+const sortByPrecedence = (items) =>
+  [...items].sort((a, b) => (Number(a.precedence) || 0) - (Number(b.precedence) || 0));
+
 export const mapServicesData = (
   services = [],
   weHandle = [],
@@ -23,25 +26,27 @@ export const mapServicesData = (
       description: service.subtitle,
       image: getImageUrl(service.image),
       icon: getImageUrl(service.icon),
-      weHandle: weHandle
-        .filter((item) => belongsToService(item, serviceId) && item.isActive !== false)
-        .map((item) => item.point),
+      weHandle: sortByPrecedence(
+        weHandle.filter((item) => belongsToService(item, serviceId) && item.isActive !== false),
+      ).map((item) => item.point),
       pricingTitle: "Individual Tax Returns",
       pricingNote: "All fees exclude GST. Final pricing depends on complexity.",
-      pricing: individualTaxReturn
-        .filter((item) => belongsToService(item, serviceId) && item.isActive !== false)
-        .map((item) => ({
-          service: item.serviceName,
-          fee: item.fee || "",
-          details: item.details,
-        })),
-      addOns: commonAddOns
-        .filter((item) => belongsToService(item, serviceId) && item.isActive !== false)
-        .map((item) => ({
-          service: item.serviceName,
-          fee: item.fee || "",
-          details: item.details,
-        })),
+      pricing: sortByPrecedence(
+        individualTaxReturn.filter(
+          (item) => belongsToService(item, serviceId) && item.isActive !== false,
+        ),
+      ).map((item) => ({
+        service: item.serviceName,
+        fee: item.fee || "",
+        details: item.details,
+      })),
+      addOns: sortByPrecedence(
+        commonAddOns.filter((item) => belongsToService(item, serviceId) && item.isActive !== false),
+      ).map((item) => ({
+        service: item.serviceName,
+        fee: item.fee || "",
+        details: item.details,
+      })),
     };
   });
 };

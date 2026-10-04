@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function ServiceDetailsDrawer({ service, onClose }) {
   const leftItems = service?.weHandle?.filter((_, i) => i % 2 === 0) || [];
   const rightItems = service?.weHandle?.filter((_, i) => i % 2 === 1) || [];
+  const pricing = service?.pricing || [];
   const addOns = service?.addOns || [];
 
   useEffect(() => {
@@ -131,7 +132,7 @@ export default function ServiceDetailsDrawer({ service, onClose }) {
               Individual Tax Returns
             </h4> */}
 
-            {Array.isArray(service?.pricing) && service.pricing.length > 0 && (
+            {pricing.length > 0 && (
               <div className="mt-[32px] overflow-hidden rounded-[16px] border border-[#CCCCCC]">
                 {/* HEADER */}
                 <div className="grid bg-[#EEF2FC] font-plusJakarta text-[14px] font-[600] leading-[1.8] text-[#121212] [grid-template-columns:280px_160px_240px] lg:[grid-template-columns:180px_80px_180px] xl:text-[16px] xl:[grid-template-columns:260px_100px_260px] 2xl:[grid-template-columns:378px_200px_320px]">
@@ -141,7 +142,7 @@ export default function ServiceDetailsDrawer({ service, onClose }) {
                 </div>
 
                 {/* ROWS */}
-                {service.pricing.map((row, i) => (
+                {pricing.map((row, i) => (
                   <div
                     key={i}
                     className="grid border-t border-[#E6E6E6] font-plusJakarta text-[12px] font-[500] leading-[1.8] text-[#333333] [grid-template-columns:280px_160px_240px] lg:[grid-template-columns:180px_80px_180px] xl:[grid-template-columns:260px_100px_260px] 2xl:text-[14px] 2xl:[grid-template-columns:378px_200px_320px]"
@@ -167,7 +168,7 @@ export default function ServiceDetailsDrawer({ service, onClose }) {
                     <div className="lg:p-[8px] xl:p-[10px]">Details</div>
                   </div>
 
-                  {service.addOns.map((row, i) => (
+                  {addOns.map((row, i) => (
                     <div
                       key={i}
                       className="grid border-t border-[#E6E6E6] font-plusJakarta text-[12px] font-[500] leading-[1.8] text-[#333333] [grid-template-columns:100px_60px_100px] lg:[grid-template-columns:180px_80px_180px] xl:text-[14px] xl:[grid-template-columns:260px_100px_260px] 2xl:text-[14px] 2xl:[grid-template-columns:378px_200px_320px]"

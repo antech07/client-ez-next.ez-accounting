@@ -9,6 +9,7 @@ import { X } from "lucide-react";
 export default function ServiceDetailsDrawerMobile({ service, onClose }) {
   const leftItems = service?.weHandle?.filter((_, i) => i % 2 === 0) || [];
   const rightItems = service?.weHandle?.filter((_, i) => i % 2 === 1) || [];
+  const pricing = service?.pricing || [];
   const addOns = service?.addOns || [];
 
   useEffect(() => {
@@ -112,25 +113,27 @@ export default function ServiceDetailsDrawerMobile({ service, onClose }) {
               Individual Tax Returns
             </h4> */}
 
-            <div className="mt-[12px] overflow-hidden rounded-[14px] border border-[#CCCCCC]">
-              <div className="grid bg-[#EEF2FC] font-plusJakarta text-[18px] font-[600] leading-[1.6] text-[#121212] [grid-template-columns:120px_70px_1fr]">
-                <div className="p-[8px]">Service</div>
-                <div className="border-l border-r p-[8px]">
-                  Fee <br /> <span className="text-[12px]">(Exl GST)</span>
+            {pricing.length > 0 && (
+              <div className="mt-[12px] overflow-hidden rounded-[14px] border border-[#CCCCCC]">
+                <div className="grid bg-[#EEF2FC] font-plusJakarta text-[18px] font-[600] leading-[1.6] text-[#121212] [grid-template-columns:120px_70px_1fr]">
+                  <div className="p-[8px]">Service</div>
+                  <div className="border-l border-r p-[8px]">
+                    Fee <br /> <span className="text-[12px]">(Exl GST)</span>
+                  </div>
+                  <div className="p-[8px]">Details</div>
                 </div>
-                <div className="p-[8px]">Details</div>
+                {pricing.map((row, i) => (
+                  <div
+                    key={i}
+                    className="grid border-t border-[#E6E6E6] font-plusJakarta text-[12px] font-[500] leading-[1.6] text-[#333333] [grid-template-columns:120px_70px_1fr]"
+                  >
+                    <div className="p-[8px]">{row.service}</div>
+                    <div className="border-l border-r p-[8px]">{row.fee}</div>
+                    <div className="p-[8px]">{row.details}</div>
+                  </div>
+                ))}
               </div>
-              {service.pricing.map((row, i) => (
-                <div
-                  key={i}
-                  className="grid border-t border-[#E6E6E6] font-plusJakarta text-[12px] font-[500] leading-[1.6] text-[#333333] [grid-template-columns:120px_70px_1fr]"
-                >
-                  <div className="p-[8px]">{row.service}</div>
-                  <div className="border-l border-r p-[8px]">{row.fee}</div>
-                  <div className="p-[8px]">{row.details}</div>
-                </div>
-              ))}
-            </div>
+            )}
 
             {/* ADD ONS (SAFE) */}
             {addOns.length > 0 && (
@@ -148,7 +151,7 @@ export default function ServiceDetailsDrawerMobile({ service, onClose }) {
                     <div className="p-[8px]">Details</div>
                   </div>
 
-                  {service.addOns.map((row, i) => (
+                  {addOns.map((row, i) => (
                     <div
                       key={i}
                       className="grid border-t border-[#E6E6E6] font-plusJakarta text-[12px] font-[500] leading-[1.6] text-[#333333] [grid-template-columns:120px_70px_1fr]"

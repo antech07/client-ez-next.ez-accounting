@@ -31,6 +31,8 @@ export default function OurServices({ services = [] }) {
 
   /*  AUTO SCROLL  */
   useEffect(() => {
+    if (!services.length) return undefined;
+
     const interval = setInterval(() => {
       if (paused) return;
 
@@ -44,10 +46,11 @@ export default function OurServices({ services = [] }) {
     }, 3500);
 
     return () => clearInterval(interval);
-  }, [paused]);
+  }, [paused, services.length]);
 
   /*  SEAMLESS RESET (AUTO ONLY)  */
   useEffect(() => {
+    if (!services.length) return;
     if (manualScrollRef.current) return;
 
     const maxIndex = loopedServices.length - visibleCount - 1;
@@ -62,7 +65,7 @@ export default function OurServices({ services = [] }) {
         });
       }, animationDuration);
     }
-  }, [startIndex]);
+  }, [loopedServices.length, services.length, startIndex]);
 
   /* MANUAL SCROLL */
   const handleWheel = (e) => {
@@ -120,9 +123,11 @@ export default function OurServices({ services = [] }) {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  const active = services[activeIndex];
-
   const [selectedService, setSelectedService] = useState(null);
+
+  if (!services.length) return null;
+
+  const active = services[activeIndex] || services[0];
 
   return (
     <section className="bg-[#F6F7F9] py-[80px]">

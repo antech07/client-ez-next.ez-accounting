@@ -2,6 +2,9 @@ import React from "react";
 import Image from "next/image";
 
 export default function Credential({ professionalCredentials }) {
+  const credentials = professionalCredentials?.[0] || {};
+  const fpa = credentials.fpa || credentials.fipa;
+
   return (
     <>
       <div className="mx-auto max-w-7xl bg-transparent px-6 md:px-10 md:py-[50px] 2xl:w-[1280px] 2xl:px-0">
@@ -31,7 +34,7 @@ export default function Credential({ professionalCredentials }) {
                   FIPA Credential
                 </span>
                 <span className="text-[20px] font-medium text-[#11122C]">
-                  #{professionalCredentials[0].fipa}
+                  {fpa ? `#${fpa}` : "—"}
                 </span>
               </div>
             </div>
@@ -49,7 +52,7 @@ export default function Credential({ professionalCredentials }) {
                   IPA Membership Number
                 </span>
                 <span className="text-[20px] font-medium text-[#11122C]">
-                  #{professionalCredentials[0].ipa}
+                  {credentials.ipa ? `#${credentials.ipa}` : "—"}
                 </span>
               </div>
             </div>
@@ -72,7 +75,7 @@ export default function Credential({ professionalCredentials }) {
                   Years of Experience
                 </span>
                 <span className="text-[30px] font-medium text-[#11122C]">
-                  {professionalCredentials[0].experience}+
+                  {credentials.experience ? `${credentials.experience}+` : "—"}
                 </span>
               </div>
             </div>

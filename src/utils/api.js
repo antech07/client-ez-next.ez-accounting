@@ -1,19 +1,19 @@
 import { Env } from "./env";
 
-export const PROJECT_API = Env.backend_url + "ez-accounting/";
+const withTrailingSlash = (url = "") => `${url.replace(/\/+$/, "")}/`;
+
+export const PROJECT_API = withTrailingSlash(Env.backend_url);
 
 export const GALLERY_API = PROJECT_API + "gallery";
 export const PROFESSIONAL_CREDENTIALS_API = PROJECT_API + "professionalCredentials";
 export const PARTNERS_API = PROJECT_API + "partners";
 export const SOCIAL_LINKS_API = PROJECT_API + "socialLinks";
-export const CONTACT_REQUEST_API = Env.backend_url + "insertFormData/ez-accounting/contactrequest";
-export const SERVICES_API = PROJECT_API + "services?all=true";
-export const WE_HANDLE_API = PROJECT_API + "weHandle?all=true";
-export const INDIVIDUALTAXRETURN_API = PROJECT_API + "individualTaxReturn?all=true";
-export const COMMONADDONS_API = PROJECT_API + "commonAddOns?all=true";
-export const TAXFILLING_REQUEST_API =
-  Env.backend_url + "insertFormData/ez-accounting/taxfillingrequest";
-export const DOCUMENT_UPLOAD_API = Env.backend_url + "insertFormData/ez-accounting/document";
+export const CONTACT_REQUEST_API = PROJECT_API + "contact-request";
+export const SERVICES_API = PROJECT_API + "services";
+export const WE_HANDLE_API = PROJECT_API + "weBundle";
+export const INDIVIDUALTAXRETURN_API = PROJECT_API + "individualTaxReturn";
+export const COMMONADDONS_API = PROJECT_API + "commonAddOns";
+export const TAXFILLING_REQUEST_API = PROJECT_API + "tax-filing-request";
 
-export const PRICING_API = PROJECT_API + "pricing?all=true";
-export const PRICINGPOINT_API = PROJECT_API + "pricingpoint?all=true";
+export const PRICING_API = PROJECT_API + "pricing";
+export const PRICINGPOINT_API = PROJECT_API + "pricingPost";

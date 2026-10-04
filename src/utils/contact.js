@@ -19,12 +19,16 @@ export const submitContactRequest = async (payload) => {
     });
 
     const text = await res.text();
+    let data;
     try {
-      const data = JSON.parse(text);
-      return data;
+      data = JSON.parse(text);
     } catch {
       throw new Error("Failed to parse response from server");
     }
+    if (!res.ok) {
+      throw new Error(data?.message || "Failed to submit contact request");
+    }
+    return data;
   } catch (err) {
     throw err;
   }
@@ -49,10 +53,12 @@ export const submitTaxFillingRequest = async (formData) => {
     gender: formData.gender,
     occupation: formData.occupation,
     married: formData.married,
-    maritalStatus: formData.married === "yes" ? "Married" : "Single",
+    maritalStatus: formData.married,
     children: formData.children,
     noOfChildren: parseInt(formData.children) || 0,
-    residencyStatus: formData.residencyStatus,
+    residencyStatus:
+      { resident: "permanent", visa: "visa holder" }[formData.residencyStatus] ||
+      formData.residencyStatus,
 
     // Step 2: Address Info
     street: formData.street,
@@ -94,7 +100,7 @@ export const submitTaxFillingRequest = async (formData) => {
     taxAgentFee: formData.taxAgentFee,
 
     // Step 4: Others
-    bankInterest: formData.bankInterest,
+    interest: formData.bankInterest,
     comment: formData.comments,
 
     sharesCryptoIncome: formData.sharesCryptoIncome,
@@ -116,11 +122,10 @@ export const submitTaxFillingRequest = async (formData) => {
 
     if (formData.documentFile) {
       const data = new FormData();
-      data.append("file", formData.documentFile);
       data.append("document", formData.documentFile);
 
       Object.keys(payload).forEach((key) => {
-        if (payload[key] !== undefined && payload[key] !== null) {
+        if (key !== "document" && payload[key] !== undefined && payload[key] !== null) {
           data.append(key, payload[key]);
         }
       });
@@ -137,12 +142,16 @@ export const submitTaxFillingRequest = async (formData) => {
     });
 
     const text = await res.text();
+    let data;
     try {
-      const data = JSON.parse(text);
-      return data;
+      data = JSON.parse(text);
     } catch {
       throw new Error("Failed to parse response from server");
     }
+    if (!res.ok) {
+      throw new Error(data?.message || "Failed to submit tax filing request");
+    }
+    return data;
   } catch (err) {
     throw err;
   }

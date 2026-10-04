@@ -3,15 +3,46 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { footerLogo, faceBook, email, phone, linkeDin, loveIcon, footerMobileLogo } from "./icons";
+import { ExternalLink } from "lucide-react";
+import {
+  facebook,
+  footerLogo,
+  footerMobileLogo,
+  instagram,
+  linkedin,
+  loveIcon,
+  xTwitter,
+} from "./icons";
 import { SOCIAL_LINKS_API } from "@/utils/api";
 
-const SOCIAL_CONFIG = [
-  { key: "facebook", icon: faceBook, alt: "Facebook" },
-  { key: "email", icon: email, alt: "Email" },
-  { key: "phone", icon: phone, alt: "Phone" },
-  { key: "linkedin", icon: linkeDin, alt: "LinkedIn" },
-];
+const SOCIAL_CONFIG = {
+  facebook: { icon: facebook, alt: "Facebook" },
+  instagram: { icon: instagram, alt: "Instagram" },
+  linkedin: { icon: linkedin, alt: "LinkedIn" },
+  x: { icon: xTwitter, alt: "X (Twitter)" },
+};
+
+const getSocialType = (social) => {
+  const label = [social?.title, social?.slug, social?.type, social?.platform]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+  const link = social?.link?.toLowerCase() || "";
+
+  if (label.includes("facebook") || link.includes("facebook.com")) return "facebook";
+  if (label.includes("instagram") || link.includes("instagram.com")) return "instagram";
+  if (label.includes("linkedin") || link.includes("linkedin.com")) return "linkedin";
+  if (
+    label === "x" ||
+    label.includes("twitter") ||
+    link.includes("twitter.com") ||
+    link.includes("x.com")
+  ) {
+    return "x";
+  }
+
+  return null;
+};
 
 export default function Footer() {
   const [socialLinks, setSocialLinks] = useState([]);
@@ -37,48 +68,40 @@ export default function Footer() {
     fetchSocialLinks();
   }, []);
 
-  const getSocialLink = (key) => {
-    const item = socialLinks.find(
-      (s) =>
-        s.slug?.toLowerCase() === key ||
-        s.title?.toLowerCase() === key ||
-        s.title?.toLowerCase().includes(key),
-    );
-    if (item && item.link) {
-      return item.link;
-    }
-    if (key === "facebook") {
-      return "https://www.facebook.com/people/EZ-Accounting-Business-Solutions/100069277013130/";
-    }
-    return "#";
-  };
+  const renderSocialIcon = (social, i) => {
+    if (!social?.link) return null;
 
-  const renderSocialIcon = (item, i) => {
-    const href = getSocialLink(item.key);
-    const isLinkActive = href && href !== "#";
+    const socialType = getSocialType(social);
+    const config = socialType ? SOCIAL_CONFIG[socialType] : null;
+    const label = social.title || config?.alt || "Social link";
 
     const content = (
-      <div className="rounded p-[4px] transition-all duration-300 hover:ring-[4px] hover:ring-[#FEFEFE]/15">
-        <Image
-          className="h-[24px] w-[24px]"
-          src={item.icon}
-          alt={item.alt}
-          width={40}
-          height={40}
-        />
+      <div
+        className="rounded p-[4px] transition-all duration-300 hover:ring-[4px] hover:ring-[#FEFEFE]/15"
+        title={label}
+      >
+        {config ? (
+          <Image
+            className="h-[24px] w-[24px]"
+            src={config.icon}
+            alt={config.alt}
+            width={40}
+            height={40}
+          />
+        ) : (
+          <ExternalLink className="h-[24px] w-[24px] text-white" aria-label={label} />
+        )}
       </div>
     );
 
-    if (isLinkActive) {
-      return (
-        <Link key={i} href={href} target="_blank" rel="noopener noreferrer">
-          {content}
-        </Link>
-      );
-    }
-
     return (
-      <Link key={i} href="#">
+      <Link
+        key={social._id || `${label}-${i}`}
+        href={social.link}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={label}
+      >
         {content}
       </Link>
     );
@@ -110,7 +133,7 @@ export default function Footer() {
 
             {/* SOCIAL ICONS */}
             <div className="mt-[14px] hidden gap-[24px] lg:flex xl:mt-[18px]">
-              {SOCIAL_CONFIG.map((item, i) => renderSocialIcon(item, i))}
+              {socialLinks.map(renderSocialIcon)}
             </div>
           </div>
 
@@ -197,7 +220,7 @@ export default function Footer() {
 
         {/* SOCIAL ICONS */}
         <div className="mt-[14px] flex w-full justify-center gap-[24px] lg:hidden xl:mt-[18px]">
-          {SOCIAL_CONFIG.map((item, i) => renderSocialIcon(item, i))}
+          {socialLinks.map(renderSocialIcon)}
         </div>
 
         {/* DIVIDER */}
